@@ -1,5 +1,4 @@
 from PIL import ImageDraw, Image, ImageFont
-import numpy as np
 import os
 
 alphabet = "~/#@0$!&*"
@@ -17,9 +16,9 @@ print(image_width, image_height)
 image_size = (image_width * len(alphabet), image_height)
 
 # Render alphabet
-image_out = Image.new("RGB", image_size, (100, 100, 100))
+image_out = Image.new("RGB", image_size, (150, 150, 150))
 draw_context = ImageDraw.Draw(image_out)
 for (i, char) in enumerate(alphabet):
-    draw_context.text((i * image_width, 0), text=char, font=font, fill=(220, 220, 220))
+    draw_context.text((i * image_width, 0), text=char, font=font, fill=(255, 255, 255))
 
 image_out.save(output_dir + "alphabet.png")

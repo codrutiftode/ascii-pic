@@ -1,19 +1,23 @@
 import sys
 import numpy as np
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageCms
 import matplotlib.pyplot as plt
 import math
+import cv2
 
 alphabet = "~/#@0$!&*"
+
 
 def main():
     image_path = sys.argv[1]
     alphabet_path = "./alphabet/alphabet.png"
     asciify(image_path, alphabet_path)
     
+
 def random_char():
     """ Returns a random ASCII draw char """
     return alphabet[math.floor(np.random.rand() * len(alphabet))]
+
 
 def asciify_legacy(image_path):
     """ Takes an image path and draws it with ASCII characters """
@@ -73,22 +77,21 @@ def asciify(image_path, alphabet_path):
 
             # Use alphabet to create luminance mask
             np_alphabet = np.array(image_alphabet.convert("L"))
-            print(np_alphabet.shape, dx)
             split_alphabet = np.array(np.split(np_alphabet, np_alphabet.shape[1] // dx, axis=1))
             countx = image_width // dx
             county = image_height // dy
             indices_mat = np.floor(np.random.rand(county, countx) * len(alphabet))
-            print (split_alphabet.shape, indices_mat.shape)
+           
             L_alphabet_blocks = split_alphabet[np.array(indices_mat, dtype="int")]
             L_alphabet = np.block([[col for col in row] for row in L_alphabet_blocks])
             print(L_alphabet.shape)
 
             # Add characters
-            hsv_image_out = np.array(image_out.convert("HSV"))
-            # print(hsv_image_out[:,:,2].shape)
-            hsv_image_out[0:1064,:,2] = L_alphabet
-            final_image = Image.fromarray(hsv_image_out, mode="HSV")
-            final_image.convert("RGB").show()
+            hls_image_out = cv2.cvtColor(np.array(image_out), cv2.COLOR_RGB2LAB)
+            print(hls_image_out[0:10, 0:10])
+            hls_image_out[0:1064, :, 0] = (hls_image_out[0:1064, :, 0] + L_alphabet / 255 * 100 * 2) // 3
+            final_image = Image.fromarray(cv2.cvtColor(hls_image_out, cv2.COLOR_LAB2RGB), mode="RGB")
+            final_image.show()
 
     
 
