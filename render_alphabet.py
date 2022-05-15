@@ -2,10 +2,12 @@ import json
 from PIL import ImageDraw, Image, ImageFont
 import os
 import json
+import numpy as np
 
 ALPHABET_DIR = "./alphabet/"
 ALPHABET_PNG = "alphabet.png"
 ALPHABET_META = "alphabet.json"
+
 
 def render_alphabet():
     alphabet = "~/#@0$!&*"
@@ -26,7 +28,7 @@ def render_alphabet():
     draw_context = ImageDraw.Draw(image_out)
     for (i, char) in enumerate(alphabet):
         draw_context.text((i * image_width, 0), text=char,
-                        font=font, fill=(255, 255, 255))
+                          font=font, fill=(255, 255, 255))
 
     image_out.save(ALPHABET_DIR + ALPHABET_PNG)
 
@@ -43,18 +45,20 @@ def render_alphabet():
 
 class Alphabet():
     """ Loads and unloads an alphabet and its metadata """
+
     def __init__(self, alphabet_dir):
         self.image_path = alphabet_dir + ALPHABET_PNG
         self.meta_path = alphabet_dir + ALPHABET_META
 
     def __enter__(self):
-        self.image = Image.open(self.image_path)
+        self._image = Image.open(self.image_path)
+        self.mask = np.array(self._image.convert("L"))
         with open(self.meta_path) as meta_file:
             self.meta = json.loads(meta_file.read())
         return self
 
     def __exit__(self, type, value, traceback):
-        self.image.close()
+        self._image.close()
 
 
 # Main function behaviour

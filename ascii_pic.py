@@ -45,9 +45,8 @@ def asciify(original_image, alphabet):
             image_out[y:y+dy, x:x+dx] = color
 
     # Use alphabet to create luminance mask
-    np_alphabet = np.array(alphabet.image.convert("L"))
     split_alphabet = np.array(
-        np.split(np_alphabet, np_alphabet.shape[1] // dx, axis=1))
+        np.split(alphabet.mask, alphabet.mask.shape[1] // dx, axis=1))
     countx = image_width // dx + 1
     county = image_height // dy + 1
     indices_mat = np.floor(np.random.rand(
